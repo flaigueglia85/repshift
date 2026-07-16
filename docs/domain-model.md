@@ -26,18 +26,51 @@ No user-owned entity should depend on an auto-increment database ID as its porta
 ```ts
 interface AthleteProfile extends EntityMetadata {
   localOwnerId: string;
-  displayName: string;
+
+  // Identity and personalization
+  username: string;
+  firstName: string;
+  lastName?: string;
+  preferredName?: string;  // name used by the coach and personalized UI
+  displayName: string;     // public-facing name if community features are enabled
+
+  // Regional preferences
   locale: string;
   unitSystem: 'metric' | 'imperial';
+
+  // Personal data used by planning and recommendations
+  birthDate?: string;      // ISO 8601 calendar date: YYYY-MM-DD
+  sex?: 'female' | 'male' | 'other' | 'prefer_not_to_say';
+  heightCm?: number;
+  bodyWeightKg?: number;
+
+  // Training profile
   experienceLevel: 'beginner' | 'intermediate' | 'advanced';
   primaryGoal: 'hypertrophy' | 'strength_hypertrophy' | 'general_fitness';
   coachingTone: 'supportive' | 'direct' | 'hard_coach';
   availableDaysPerWeek: number;
   preferredSessionMinutes: number;
-  birthYear?: number;
-  sex?: 'female' | 'male' | 'other' | 'prefer_not_to_say';
-  heightCm?: number;
+}
+```
+
+`preferredName` should be used for greetings, coaching messages and workout feedback. If it is absent, the application falls back to `firstName`, then `username`.
+
+Age must be derived from `birthDate` at runtime rather than stored as a separate mutable field. This avoids stale age data and supports age-aware planning rules.
+
+During local-only operation, `username` identifies the athlete inside the device and does not need global uniqueness. When cloud accounts are introduced, the backend will validate and reserve a globally unique username. Local profile IDs remain the authoritative link to existing plans and history during account migration.
+
+Identity data, private personal data and future public profile data must remain logically separated. Birth date, body measurements and health information must never become public by default.
+
+Body weight in the profile represents the latest known value for quick access. Long-term body-weight progression should be stored as dated measurements rather than overwriting historical values.
+
+```ts
+interface BodyMeasurement extends EntityMetadata {
+  localOwnerId: string;
+  measuredAt: string;
   bodyWeightKg?: number;
+  heightCm?: number;
+  bodyFatPercent?: number;
+  notes?: string;
 }
 ```
 
@@ -277,6 +310,8 @@ English is the canonical fallback locale. Italian is included at launch. New loc
 ### User-owned data
 
 - athlete profile;
+- identity and personalization preferences;
+- body measurements;
 - available equipment;
 - plate inventory;
 - plans;
