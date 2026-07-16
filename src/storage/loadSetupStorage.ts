@@ -14,16 +14,22 @@ export function loadLoadSetup(): LoadSetupProfile | null {
   try {
     const raw = localStorage.getItem(LOAD_SETUP_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as LoadSetupProfile & { machineIncrementKg?: number; schemaVersion?: number; adjustableDumbbellHandleKg?: number };
+    const parsed = JSON.parse(raw) as LoadSetupProfile & {
+      machineIncrementKg?: number;
+      schemaVersion?: number;
+      adjustableDumbbellHandleKg?: number;
+      includeAdjustableDumbbellHandleWeight?: boolean;
+    };
 
-    if (parsed.schemaVersion === 3) return parsed;
-    if (parsed.schemaVersion === 1 || parsed.schemaVersion === 2) {
+    if (parsed.schemaVersion === 4) return parsed;
+    if ([1, 2, 3].includes(parsed.schemaVersion ?? 0)) {
       return {
         ...parsed,
         machineConfigs: parsed.machineConfigs ?? [],
         cableIncrementKg: parsed.cableIncrementKg ?? 2.5,
         adjustableDumbbellHandleKg: parsed.adjustableDumbbellHandleKg ?? 2.5,
-        schemaVersion: 3,
+        includeAdjustableDumbbellHandleWeight: false,
+        schemaVersion: 4,
       } as LoadSetupProfile;
     }
     return null;
@@ -43,7 +49,7 @@ export function saveLoadSetup(
     createdAt: current?.createdAt ?? now,
     updatedAt: now,
     revision: (current?.revision ?? 0) + 1,
-    schemaVersion: 3,
+    schemaVersion: 4,
   };
   localStorage.setItem(LOAD_SETUP_KEY, JSON.stringify(next));
   return next;
