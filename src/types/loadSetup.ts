@@ -19,13 +19,14 @@ export interface LoadSetupProfile {
   dumbbellMode: 'fixed' | 'adjustable' | 'both';
   dumbbellStepKg: number;
   maxDumbbellKg: number;
+  includeAdjustableDumbbellHandleWeight: boolean;
   adjustableDumbbellHandleKg: number;
   cableIncrementKg: number;
   machineConfigs: MachineLoadConfig[];
   createdAt: string;
   updatedAt: string;
   revision: number;
-  schemaVersion: 3;
+  schemaVersion: 4;
 }
 
 export interface PlateSolution {
