@@ -3,6 +3,15 @@ export interface PlateInventoryItem {
   quantity: number;
 }
 
+export type MachineLoadingMode = 'weight_stack' | 'plate_loaded';
+
+export interface MachineLoadConfig {
+  equipmentId: string;
+  loadingMode: MachineLoadingMode;
+  incrementKg: number;
+  startingResistanceKg: number;
+}
+
 export interface LoadSetupProfile {
   id: string;
   barbellWeightKg: number;
@@ -10,12 +19,12 @@ export interface LoadSetupProfile {
   dumbbellMode: 'fixed' | 'adjustable' | 'both';
   dumbbellStepKg: number;
   maxDumbbellKg: number;
-  machineIncrementKg: number;
   cableIncrementKg: number;
+  machineConfigs: MachineLoadConfig[];
   createdAt: string;
   updatedAt: string;
   revision: number;
-  schemaVersion: 1;
+  schemaVersion: 2;
 }
 
 export interface PlateSolution {
