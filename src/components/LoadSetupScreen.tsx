@@ -4,6 +4,7 @@ import { loadEquipmentProfile } from '../storage/equipmentStorage';
 import { calculateDumbbellPlateSolution, calculatePlateSolution, createMachineConfig, defaultPlates } from '../storage/loadSetupStorage';
 import type { LoadSetupProfile, MachineLoadConfig, PlateInventoryItem } from '../types/loadSetup';
 import type { MessageKey } from '../i18n/messages';
+import '../loadSetupEnhancements.css';
 
 interface Props {
   current: LoadSetupProfile | null;
