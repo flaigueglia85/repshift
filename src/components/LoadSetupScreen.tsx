@@ -74,6 +74,7 @@ export default function LoadSetupScreen({ current, t, onBack, onSave }: Props) {
     <nav className="load-tabbar" aria-label={t('loadSections')}>
       {tabs.map((tab) => <button key={tab.id} type="button" className={activeTab === tab.id ? 'active' : ''} onClick={() => { setActiveTab(tab.id); setOpenInfo(null); }}><span>{tab.icon}</span><small>{t(tab.label)}</small></button>)}
     </nav>
+    <div className="load-tab-spacer" aria-hidden="true" />
 
     <div className="tab-panel" key={activeTab}>
       {activeTab === 'plates' && <>
