@@ -14,15 +14,16 @@ export function loadLoadSetup(): LoadSetupProfile | null {
   try {
     const raw = localStorage.getItem(LOAD_SETUP_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as LoadSetupProfile & { machineIncrementKg?: number; schemaVersion?: number };
+    const parsed = JSON.parse(raw) as LoadSetupProfile & { machineIncrementKg?: number; schemaVersion?: number; adjustableDumbbellHandleKg?: number };
 
-    if (parsed.schemaVersion === 2) return parsed;
-    if (parsed.schemaVersion === 1) {
+    if (parsed.schemaVersion === 3) return parsed;
+    if (parsed.schemaVersion === 1 || parsed.schemaVersion === 2) {
       return {
         ...parsed,
-        machineConfigs: [],
+        machineConfigs: parsed.machineConfigs ?? [],
         cableIncrementKg: parsed.cableIncrementKg ?? 2.5,
-        schemaVersion: 2,
+        adjustableDumbbellHandleKg: parsed.adjustableDumbbellHandleKg ?? 2.5,
+        schemaVersion: 3,
       } as LoadSetupProfile;
     }
     return null;
@@ -42,30 +43,22 @@ export function saveLoadSetup(
     createdAt: current?.createdAt ?? now,
     updatedAt: now,
     revision: (current?.revision ?? 0) + 1,
-    schemaVersion: 2,
+    schemaVersion: 3,
   };
   localStorage.setItem(LOAD_SETUP_KEY, JSON.stringify(next));
   return next;
 }
 
-export function createMachineConfig(
-  equipmentId: string,
-  loadingMode: MachineLoadConfig['loadingMode'],
-): MachineLoadConfig {
-  return {
-    equipmentId,
-    loadingMode,
-    incrementKg: loadingMode === 'plate_loaded' ? 5 : 5,
-    startingResistanceKg: 0,
-  };
+export function createMachineConfig(equipmentId: string, loadingMode: MachineLoadConfig['loadingMode']): MachineLoadConfig {
+  return { equipmentId, loadingMode, incrementKg: 5, startingResistanceKg: 0 };
 }
 
-export function calculatePlateSolution(targetKg: number, barbellWeightKg: number, plates: PlateInventoryItem[]): PlateSolution {
-  const targetPerSide = Math.max(0, (targetKg - barbellWeightKg) / 2);
+function calculateSymmetricLoad(targetKg: number, baseWeightKg: number, plates: PlateInventoryItem[], requiredCopiesPerPlate: number): PlateSolution {
+  const targetPerSide = Math.max(0, (targetKg - baseWeightKg) / 2);
   const available = plates
-    .filter((plate) => plate.quantity >= 2)
+    .filter((plate) => plate.quantity >= requiredCopiesPerPlate)
     .sort((a, b) => b.weightKg - a.weightKg)
-    .flatMap((plate) => Array(Math.floor(plate.quantity / 2)).fill(plate.weightKg));
+    .flatMap((plate) => Array(Math.floor(plate.quantity / requiredCopiesPerPlate)).fill(plate.weightKg));
 
   const perSide: number[] = [];
   let remaining = targetPerSide;
@@ -76,6 +69,14 @@ export function calculatePlateSolution(targetKg: number, barbellWeightKg: number
     }
   });
 
-  const achievedKg = barbellWeightKg + perSide.reduce((sum, weight) => sum + weight * 2, 0);
+  const achievedKg = baseWeightKg + perSide.reduce((sum, weight) => sum + weight * 2, 0);
   return { perSide, achievedKg, differenceKg: Math.round((targetKg - achievedKg) * 100) / 100 };
+}
+
+export function calculatePlateSolution(targetKg: number, barbellWeightKg: number, plates: PlateInventoryItem[]): PlateSolution {
+  return calculateSymmetricLoad(targetKg, barbellWeightKg, plates, 2);
+}
+
+export function calculateDumbbellPlateSolution(targetPerDumbbellKg: number, handleWeightKg: number, plates: PlateInventoryItem[]): PlateSolution {
+  return calculateSymmetricLoad(targetPerDumbbellKg, handleWeightKg, plates, 4);
 }
