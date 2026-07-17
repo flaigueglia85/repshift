@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import ExerciseLibraryScreen from './ExerciseLibraryScreen';
 import type { Locale } from '../types/athlete';
 import type { EquipmentProfile } from '../types/equipment';
 import type { LoadSetupProfile } from '../types/loadSetup';
@@ -17,12 +19,16 @@ interface Props {
 }
 
 export default function ConfigurationHub({ locale, t, equipmentProfile, loadSetupProfile, onProfile, onEquipment, onLoads, onLocale, theme, onTheme }: Props) {
+  const [libraryOpen, setLibraryOpen] = useState(false);
   const completed = 1 + (equipmentProfile ? 1 : 0) + (loadSetupProfile ? 1 : 0);
+  if (libraryOpen) return <section className="library-route"><div className="library-route-header"><button onClick={() => setLibraryOpen(false)}>‹</button><div><small>{locale === 'it' ? 'ESERCIZI' : 'EXERCISES'}</small><strong>{locale === 'it' ? 'Libreria esercizi' : 'Exercise library'}</strong></div><span /></div><ExerciseLibraryScreen locale={locale} equipmentProfile={equipmentProfile} /></section>;
   return <section className="configuration-hub">
     <div className="configuration-hero">
       <div><span className="eyebrow">{t('configuration')}</span><h1>{t('configurationTitle')}</h1><p>{t('configurationBody')}</p></div>
       <div className="configuration-score"><strong>{completed}/3</strong><small>{t('configurationProgress')}</small></div>
     </div>
+
+    <button className="library-launch-card" onClick={() => setLibraryOpen(true)}><span>↗</span><div><small>{locale === 'it' ? 'LIBRERIA INTELLIGENTE' : 'SMART LIBRARY'}</small><strong>{locale === 'it' ? 'Esplora gli esercizi' : 'Explore exercises'}</strong><em>{locale === 'it' ? 'Filtrati sul tuo setup reale' : 'Filtered by your real setup'}</em></div><b>›</b></button>
 
     <div className="config-section-label">{t('trainingSetup')}</div>
     <div className="config-stack">
