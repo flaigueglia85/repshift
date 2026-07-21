@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { exerciseCatalog } from '../data/exerciseCatalog';
 import { buildLoadGuidance, buildTransitionInstruction, withMountOption } from '../domain/loadGuidance';
 import type { LoadSetupProfile } from '../types/loadSetup';
+import '../loadGuideOptions.css';
 
 interface Props {
   exerciseId: string;
