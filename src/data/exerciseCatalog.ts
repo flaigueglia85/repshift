@@ -1,5 +1,6 @@
 import type { ExerciseDefinition } from '../types/exercise';
 import { importedExercises } from './importedExercisePack';
+import { expandedExercises } from './expandedExercisePack';
 
 const commonTip = 'exerciseTipControlled';
 const commonMistake = 'exerciseMistakeMomentum';
@@ -34,4 +35,4 @@ const coreExerciseCatalog: ExerciseDefinition[] = [
   { id:'dead_bug',nameKey:'exerciseDeadBug',primaryMuscle:'core',secondaryMuscles:[],movementPattern:'core',requiredEquipment:[],difficulty:'beginner',icon:'✣',tipKey:'exerciseTipCore',mistakeKey:'exerciseMistakeCore',alternativeIds:['plank'] },
 ];
 
-export const exerciseCatalog: ExerciseDefinition[] = [...coreExerciseCatalog, ...importedExercises];
+export const exerciseCatalog: ExerciseDefinition[] = [...coreExerciseCatalog, ...importedExercises, ...expandedExercises];
