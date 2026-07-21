@@ -1,9 +1,10 @@
 import type { ExerciseDefinition } from '../types/exercise';
+import { importedExercises } from './importedExercisePack';
 
 const commonTip = 'exerciseTipControlled';
 const commonMistake = 'exerciseMistakeMomentum';
 
-export const exerciseCatalog: ExerciseDefinition[] = [
+const coreExerciseCatalog: ExerciseDefinition[] = [
   { id:'barbell_bench_press',nameKey:'exerciseBarbellBenchPress',primaryMuscle:'chest',secondaryMuscles:['triceps','shoulders'],movementPattern:'horizontal_push',requiredEquipment:['barbell','bench'],optionalEquipment:['rack'],difficulty:'intermediate',icon:'▰',tipKey:commonTip,mistakeKey:'exerciseMistakeBench',alternativeIds:['dumbbell_bench_press','push_up'] },
   { id:'dumbbell_bench_press',nameKey:'exerciseDumbbellBenchPress',primaryMuscle:'chest',secondaryMuscles:['triceps','shoulders'],movementPattern:'horizontal_push',requiredEquipment:['dumbbells','bench'],difficulty:'beginner',icon:'◆',tipKey:commonTip,mistakeKey:'exerciseMistakeBench',alternativeIds:['barbell_bench_press','push_up'] },
   { id:'push_up',nameKey:'exercisePushUp',primaryMuscle:'chest',secondaryMuscles:['triceps','shoulders','core'],movementPattern:'horizontal_push',requiredEquipment:[],difficulty:'beginner',icon:'↔',tipKey:'exerciseTipPushUp',mistakeKey:'exerciseMistakePushUp',alternativeIds:['dumbbell_bench_press'] },
@@ -32,3 +33,5 @@ export const exerciseCatalog: ExerciseDefinition[] = [
   { id:'plank',nameKey:'exercisePlank',primaryMuscle:'core',secondaryMuscles:['glutes','shoulders'],movementPattern:'core',requiredEquipment:[],difficulty:'beginner',icon:'▬',tipKey:'exerciseTipPlank',mistakeKey:'exerciseMistakePlank',alternativeIds:['dead_bug'] },
   { id:'dead_bug',nameKey:'exerciseDeadBug',primaryMuscle:'core',secondaryMuscles:[],movementPattern:'core',requiredEquipment:[],difficulty:'beginner',icon:'✣',tipKey:'exerciseTipCore',mistakeKey:'exerciseMistakeCore',alternativeIds:['plank'] },
 ];
+
+export const exerciseCatalog: ExerciseDefinition[] = [...coreExerciseCatalog, ...importedExercises];
