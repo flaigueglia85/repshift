@@ -7,8 +7,21 @@ export const defaultPlates: PlateInventoryItem[] = [
   { weightKg: 10, quantity: 4 },
   { weightKg: 5, quantity: 4 },
   { weightKg: 2.5, quantity: 4 },
+  { weightKg: 2, quantity: 4 },
   { weightKg: 1.25, quantity: 4 },
+  { weightKg: 1, quantity: 4 },
 ];
+
+const supportedPlateWeights = defaultPlates.map((plate) => plate.weightKg);
+
+function normalizePlates(plates: PlateInventoryItem[] | undefined): PlateInventoryItem[] {
+  const saved = plates ?? [];
+  const normalized = supportedPlateWeights.map((weightKg) =>
+    saved.find((plate) => plate.weightKg === weightKg) ?? { weightKg, quantity: 0 },
+  );
+  const custom = saved.filter((plate) => !supportedPlateWeights.includes(plate.weightKg));
+  return [...normalized, ...custom].sort((a, b) => b.weightKg - a.weightKg);
+}
 
 export function loadLoadSetup(): LoadSetupProfile | null {
   try {
@@ -21,10 +34,13 @@ export function loadLoadSetup(): LoadSetupProfile | null {
       includeAdjustableDumbbellHandleWeight?: boolean;
     };
 
-    if (parsed.schemaVersion === 4) return parsed;
+    if (parsed.schemaVersion === 4) {
+      return { ...parsed, plates: normalizePlates(parsed.plates) };
+    }
     if ([1, 2, 3].includes(parsed.schemaVersion ?? 0)) {
       return {
         ...parsed,
+        plates: normalizePlates(parsed.plates),
         machineConfigs: parsed.machineConfigs ?? [],
         cableIncrementKg: parsed.cableIncrementKg ?? 2.5,
         adjustableDumbbellHandleKg: parsed.adjustableDumbbellHandleKg ?? 2.5,
@@ -45,6 +61,7 @@ export function saveLoadSetup(
   const now = new Date().toISOString();
   const next: LoadSetupProfile = {
     ...draft,
+    plates: normalizePlates(draft.plates),
     id: current?.id ?? crypto.randomUUID(),
     createdAt: current?.createdAt ?? now,
     updatedAt: now,
