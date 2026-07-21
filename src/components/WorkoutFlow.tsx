@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import ExerciseLoadGuide from './ExerciseLoadGuide';
 import { exerciseCatalog } from '../data/exerciseCatalog';
+import { getExerciseName } from '../data/exerciseNames';
 import { loadActiveWorkoutSession, loadWorkoutSessions, loadWorkoutTemplates, saveActiveWorkoutSession, saveWorkoutSessions, saveWorkoutTemplates } from '../storage/workoutStorage';
 import type { LoadSetupProfile } from '../types/loadSetup';
 import type { WorkoutExerciseDraft, WorkoutSession, WorkoutTemplate } from '../types/workout';
@@ -10,11 +11,8 @@ import '../liveSliderEnhancements.css';
 interface Props { locale: 'it' | 'en'; onExit: () => void; loadSetup: LoadSetupProfile | null; }
 type Mode = 'hub' | 'builder' | 'live' | 'history';
 
-const labels: Record<string,{it:string;en:string}> = {
-  barbell_bench_press:{it:'Panca piana bilanciere',en:'Barbell bench press'},dumbbell_bench_press:{it:'Panca piana manubri',en:'Dumbbell bench press'},push_up:{it:'Piegamenti',en:'Push-up'},overhead_press:{it:'Military press',en:'Overhead press'},dumbbell_shoulder_press:{it:'Shoulder press manubri',en:'Dumbbell shoulder press'},lateral_raise:{it:'Alzate laterali',en:'Lateral raise'},pull_up:{it:'Trazioni',en:'Pull-up'},lat_pulldown:{it:'Lat machine',en:'Lat pulldown'},barbell_row:{it:'Rematore bilanciere',en:'Barbell row'},one_arm_dumbbell_row:{it:'Rematore manubrio',en:'One-arm dumbbell row'},barbell_squat:{it:'Squat bilanciere',en:'Barbell squat'},goblet_squat:{it:'Goblet squat',en:'Goblet squat'},leg_press:{it:'Leg press',en:'Leg press'},romanian_deadlift:{it:'Stacco rumeno',en:'Romanian deadlift'},leg_curl:{it:'Leg curl',en:'Leg curl'},leg_extension:{it:'Leg extension',en:'Leg extension'},dumbbell_lunge:{it:'Affondi con manubri',en:'Dumbbell lunge'},dumbbell_curl:{it:'Curl manubri',en:'Dumbbell curl'},cable_triceps_pushdown:{it:'Pushdown tricipiti',en:'Cable triceps pushdown'},plank:{it:'Plank',en:'Plank'}
-};
 const uid=()=>crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
-const exerciseName=(id:string,locale:'it'|'en')=>labels[id]?.[locale]??id.replaceAll('_',' ');
+const exerciseName=(id:string,locale:'it'|'en')=>getExerciseName(id,locale);
 const clamp=(value:number,min:number,max:number)=>Math.min(max,Math.max(min,value));
 
 function lastPerformance(history:WorkoutSession[],exerciseId:string){
@@ -54,7 +52,7 @@ export default function WorkoutFlow({locale,onExit,loadSetup}:Props){
     setDebouncedLoad(next);
   },[active?.id,currentExercise]);
 
-  const filtered=useMemo(()=>exerciseCatalog.filter(x=>exerciseName(x.id,locale).toLowerCase().includes(query.toLowerCase())).slice(0,30),[query,locale]);
+  const filtered=useMemo(()=>exerciseCatalog.filter(x=>exerciseName(x.id,locale).toLowerCase().includes(query.toLowerCase())).sort((a,b)=>exerciseName(a.id,locale).localeCompare(exerciseName(b.id,locale))),[query,locale]);
   const updateDraft=(id:string,patch:Partial<WorkoutExerciseDraft>)=>setDraft(rows=>rows.map(row=>row.id===id?{...row,...patch}:row));
   const move=(index:number,delta:number)=>setDraft(rows=>{const next=[...rows];const target=index+delta;if(target<0||target>=next.length)return rows;[next[index],next[target]]=[next[target],next[index]];return next});
   const createRow=(exerciseId:string):WorkoutExerciseDraft=>{const previous=lastPerformance(history,exerciseId);return{id:uid(),exerciseId,sets:3,targetReps:previous?.reps??10,targetLoadKg:previous?.loadKg??20,restSeconds:90}};
