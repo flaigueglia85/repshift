@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { exerciseCatalog } from '../data/exerciseCatalog';
 import { exerciseContent } from '../data/exerciseContent';
 import { importedExerciseContent } from '../data/importedExercisePack';
+import { expandedExerciseContent } from '../data/expandedExercisePack';
 import { getExerciseName } from '../data/exerciseNames';
 import { exerciseSourceReferences } from '../data/exerciseSourceReferences';
 import { getExerciseVisualStages } from '../data/exerciseVisualStages';
@@ -15,7 +16,7 @@ const muscleLabels:Record<MuscleGroup,{it:string;en:string}>={chest:{it:'Petto',
 const patternLabels:Record<MovementPattern,{it:string;en:string}>={horizontal_push:{it:'Spinta orizzontale',en:'Horizontal push'},horizontal_pull:{it:'Tirata orizzontale',en:'Horizontal pull'},vertical_push:{it:'Spinta verticale',en:'Vertical push'},vertical_pull:{it:'Tirata verticale',en:'Vertical pull'},squat:{it:'Squat',en:'Squat'},hinge:{it:'Hip hinge',en:'Hip hinge'},lunge:{it:'Affondo',en:'Lunge'},isolation:{it:'Isolamento',en:'Isolation'},carry:{it:'Trasporto',en:'Carry'},core:{it:'Core',en:'Core'}};
 const patternIcons:Record<MovementPattern,string>={horizontal_push:'→',horizontal_pull:'←',vertical_push:'↑',vertical_pull:'↓',squat:'▼',hinge:'⌄',lunge:'↘',isolation:'◎',carry:'▣',core:'✣'};
 const equipmentLabels:Record<string,{it:string;en:string}>={barbell:{it:'Bilanciere',en:'Barbell'},dumbbells:{it:'Manubri',en:'Dumbbells'},adjustable_dumbbells:{it:'Manubri regolabili',en:'Adjustable dumbbells'},bench:{it:'Panca',en:'Bench'},rack:{it:'Rack',en:'Rack'},cable_station:{it:'Stazione cavi',en:'Cable station'},lat_pulldown:{it:'Lat machine',en:'Lat pulldown'},leg_press:{it:'Leg press',en:'Leg press'},leg_extension:{it:'Leg extension',en:'Leg extension'},leg_curl:{it:'Leg curl',en:'Leg curl'},pullup_bar:{it:'Sbarra trazioni',en:'Pull-up bar'},bands:{it:'Elastici',en:'Bands'},chest_press_machine:{it:'Chest press machine',en:'Chest press machine'},pec_deck_machine:{it:'Pec deck / reverse fly',en:'Pec deck / reverse fly'},assisted_pullup_dip_machine:{it:'Macchina trazioni/dip assistite',en:'Assisted pull-up/dip machine'},chest_supported_row_machine:{it:'Rematore chest-supported',en:'Chest-supported row machine'},hack_squat_machine:{it:'Hack squat machine',en:'Hack squat machine'},smith_machine:{it:'Smith machine',en:'Smith machine'},seated_leg_curl_machine:{it:'Leg curl seduto',en:'Seated leg curl machine'},hip_thrust_machine:{it:'Hip thrust machine',en:'Hip thrust machine'},calf_raise_machine:{it:'Calf raise machine',en:'Calf raise machine'},preacher_curl_machine:{it:'Preacher curl machine',en:'Preacher curl machine'}};
-const allContent={...exerciseContent,...importedExerciseContent};
+const allContent={...exerciseContent,...importedExerciseContent,...expandedExerciseContent};
 
 export default function ExerciseLibraryScreen({locale,equipmentProfile}:Props){
  const [query,setQuery]=useState(''); const [muscle,setMuscle]=useState<MuscleGroup|'all'>('all'); const [pattern,setPattern]=useState<MovementPattern|'all'>('all'); const [availableOnly,setAvailableOnly]=useState(true); const [selected,setSelected]=useState<ExerciseDefinition|null>(null);
