@@ -1,3 +1,5 @@
+import '../exerciseSourceReferences.css';
+
 export interface ExerciseSourceReference {
   source: 'free-exercise-db' | 'wger';
   sourceId: string;
