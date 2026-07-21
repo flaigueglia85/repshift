@@ -4,6 +4,7 @@ export type LoadingType = 'bodyweight' | 'fixed_weight' | 'free_plates' | 'plate
 export interface EquipmentDefinition {
   id: string;
   nameKey: string;
+  displayName?: { it: string; en: string };
   category: EquipmentCategory;
   loadingType: LoadingType;
   icon: string;
